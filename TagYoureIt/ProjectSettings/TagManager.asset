@@ -3,18 +3,22 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Ground
+  - InteractableObject
+  - Character
+  - Sensor
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Character
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Object
+  - ObjectSensor
+  - IObject
   - 
   - 
   - 
@@ -40,4 +44,28 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: FRONT-BG-1
+    uniqueID: 2440324229
+    locked: 0
+  - name: FRONT-BG-2
+    uniqueID: 3608164405
+    locked: 0
+  - name: INTERACT-OBJ-1
+    uniqueID: 2023584987
+    locked: 0
+  - name: FRONT-BG-3
+    uniqueID: 3323570103
+    locked: 0
+  - name: FRONT-BG-4
+    uniqueID: 810304537
+    locked: 0
+  - name: INTERACT-OBJ-2
+    uniqueID: 45056291
+    locked: 0
+  - name: PLAYER
+    uniqueID: 308771373
+    locked: 0
+  - name: FRONT-DECO
+    uniqueID: 2093200533
     locked: 0
