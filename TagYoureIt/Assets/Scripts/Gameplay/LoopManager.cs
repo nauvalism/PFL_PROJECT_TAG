@@ -31,6 +31,7 @@ public class LoopManager : MonoBehaviour
         this.gameState = to;
     }
 
+
     public GameState GetGameState()
     {
         return gameState;

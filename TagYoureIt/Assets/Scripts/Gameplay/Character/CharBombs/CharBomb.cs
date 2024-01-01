@@ -6,6 +6,8 @@ using TMPro;
 public class CharBomb : MonoBehaviour
 {
     [SerializeField] BaseChar coreChar;
+    [SerializeField] Animator anim;
+    [SerializeField] AnimatorClips clips;
     [SerializeField] bool bombed;
     [SerializeField] int maxCountDown;
     [SerializeField] int countDown;
@@ -80,6 +82,7 @@ public class CharBomb : MonoBehaviour
         LeanTween.cancel(bombRoot.gameObject);
         bombRoot.transform.localScale = Vector3.one;
         LeanTween.scale(bombRoot.gameObject, new Vector3(1.2f,1.2f,1.25f), 1.5f).setEase(LeanTweenType.punch);
+        anim.Play("BombTss", -1, 0);
     }
 
     public void HideBomb()
@@ -87,6 +90,7 @@ public class CharBomb : MonoBehaviour
         LeanTween.cancel(bombRoot.gameObject);
         bombRoot.transform.localScale = Vector3.one;
         LeanTween.scale(bombRoot.gameObject, Vector3.zero, 0.25f).setEase(LeanTweenType.easeOutQuad);
+        anim.Play("Idle");
     }
 
     public void Explode()

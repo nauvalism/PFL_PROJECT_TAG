@@ -64,7 +64,9 @@ public class PlayerManager : MonoBehaviour
 
     public bool DecreaseLive(int who)
     {
-        return players[who].DecreaseLive();
+        bool result = players[who].DecreaseLive();
+        allPlayersChars[who].SetAlive(!result);
+        return result;
     }
 
     public bool DecreaseLive(int who, int which)

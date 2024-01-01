@@ -15,6 +15,7 @@ public class GameplayController : MonoBehaviour
 
     private void Start() {
         loop.Intro(()=>{
+            SetState(GameState.midGame);
             GachaBomb();
         });
         //GachaBomb();
@@ -27,9 +28,10 @@ public class GameplayController : MonoBehaviour
 
 
 
-    public void Explode(PlayerIdentity who)
+    public bool Explode(PlayerIdentity who)
     {
-        if(pm.DecreaseLive((int)who))
+        bool die = pm.DecreaseLive((int)who);
+        if(die)
         {
             loop.ChangeGameState(GameState.calculating);
         }
@@ -37,6 +39,8 @@ public class GameplayController : MonoBehaviour
         {
             pm.GachaBomb();
         }
+
+        return die;
     }
 
 
@@ -69,5 +73,16 @@ public class GameplayController : MonoBehaviour
     public bool IsYou(PEntity credential)
     {
         return pm.IsYou(credential);
+    }
+
+    public GameState SetState(GameState state)
+    {
+        loop.ChangeGameState(state);
+        return loop.GetGameState();
+    }
+
+    public GameState GetState()
+    {
+        return loop.GetGameState();
     }
 }

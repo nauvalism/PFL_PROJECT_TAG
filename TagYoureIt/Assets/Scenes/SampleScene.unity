@@ -1284,7 +1284,7 @@ MonoBehaviour:
     csd:
       chosenCharacterID: 0
       chosenCharacterIDs: 
-    mainLives: 3
+    mainLives: 1
     lives: 
   - profile:
       userID: 
@@ -1297,7 +1297,7 @@ MonoBehaviour:
     csd:
       chosenCharacterID: 0
       chosenCharacterIDs: 
-    mainLives: 3
+    mainLives: 1
     lives: 
   allPlayersChars:
   - {fileID: 759362261}
@@ -5989,6 +5989,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coreChar: {fileID: 0}
+  anim: {fileID: 0}
+  clips: {fileID: 0}
   bombed: 0
   maxCountDown: 0
   countDown: 0
@@ -7673,6 +7675,7 @@ MonoBehaviour:
   bubbleRoot: {fileID: 951492756}
   charSkill: {fileID: 0}
   iSensor: {fileID: 1817988016}
+  explo: {fileID: 0}
 --- !u!114 &1906645334
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -47,6 +47,7 @@ public class BaseChar : MonoBehaviour
     [Header("Extras")]    
     [SerializeField] BaseCharSkill charSkill;
     [SerializeField] InteractionSensor iSensor;
+    [SerializeField] Explosion explo;
     
     
     public virtual void InitializeIdentity(PlayerIdentity iden, int _order)
@@ -75,6 +76,14 @@ public class BaseChar : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        if(GameplayController.instance.GetState() != GameState.midGame)
+        {
+            return;
+        }
+
+
+        if(!root.GetAlive())
+        return;
         
         if(movementAttributes.controllable)
         {
@@ -124,6 +133,10 @@ public class BaseChar : MonoBehaviour
     }
 
     private void FixedUpdate() {
+
+        if(!root.GetAlive())
+        return;
+
         grounded = Physics2D.Linecast(groundCheckF.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
     
         Vector2 moveDirection = new Vector2(movement.x, 0).normalized;
@@ -270,6 +283,8 @@ public class BaseChar : MonoBehaviour
     public virtual void TransferBomb(int who)
     {
         
+
+
         BaseChar bc = GameplayController.instance.GetPM().GetChar(who);
         Vector2 _force;
         Vector2 _dir = bc.GetPosition() - (Vector2)rootActorMovement.position;
@@ -278,11 +293,15 @@ public class BaseChar : MonoBehaviour
         bc.Launch(_force);
         bomb.GiveBomb();
         bc.ReceiveBomb();
+        bc.Hit();
         iSensor.NullifyInteractedChar();
+        //animManager.PlayAnimAbsolutely("Hit");
     }
 
     public virtual void TransferBomb(BaseChar bc)
     {
+        
+        
         
         Vector2 _force;
         Vector2 _dir = bc.GetPosition() - (Vector2)rootActorMovement.position;
@@ -323,7 +342,7 @@ public class BaseChar : MonoBehaviour
 
     }
 
-    public virtual void Launch(Vector2 _f, float multiplier = 75.0f)
+    public virtual void Launch(Vector2 _f, float multiplier = 75.0f, bool dead = false)
     {
         Debug.Log("LAUNCH !!");
         Stunned();
@@ -331,7 +350,8 @@ public class BaseChar : MonoBehaviour
         rb.AddForce(_f * multiplier);
         iSensor.DisableCol();
         StopCoroutine(Recovery());
-        StartCoroutine(Recovery());
+        if(!dead)
+            StartCoroutine(Recovery());
         // LeanTween.value(rootActorMovement.gameObject, rb.velocity.x, .0f, 5.0f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
         //     rb.velocity = new Vector2(f, rb.velocity.y);
         // });
@@ -350,10 +370,14 @@ public class BaseChar : MonoBehaviour
         rb.sharedMaterial = null;
         col.enabled = true;
         movementAttributes.controllable = true;
+        animManager.Move();
+        animManager.PlayNonMovementAnim("Idle");
     }
 
     public void Explode()
     {
+        
+
         Vector2 _force;
         float x = 1;
         if(Random.Range(0,2) == 0)
@@ -365,9 +389,21 @@ public class BaseChar : MonoBehaviour
             x = -1;
         }
         _force = new Vector2(x, 1);
-        Launch(_force);
+        _force.Normalize();
+        
+        explo.Explode();
         Effects.instance.TriggerEffect(EffectList.camShake); 
-        GameplayController.instance.Explode(root.GetID());
+        if(GameplayController.instance.Explode(root.GetID()))
+        {
+            animManager.PlayAnimAbsolutely("DeadHit");
+            Launch(_force, 400, true);
+        }
+        else
+        {
+            animManager.PlayAnimAbsolutely("Hit");
+            Launch(_force, 300);
+        }
+        
     }
 
     public virtual void Stunned()
@@ -375,6 +411,17 @@ public class BaseChar : MonoBehaviour
         movementAttributes.controllable = false;
         movement.x = 0;
         movement.y = 0;
+        animManager.UnMove();
+    }
+
+    public void Hit()
+    {
+        animManager.PlayAnimAbsolutely("Hit");
+    }
+
+    public void HitDead()
+    {
+        animManager.PlayAnimAbsolutely("DeadHit");
     }
 
     public virtual void EnableMovement()

@@ -9,7 +9,7 @@ public class TopChar : MonoBehaviour
     [SerializeField] CharacterProfile characterAttributes;
     [SerializeField] BaseChar coreChar;
     [SerializeField] bool isYou = false;
-
+    [SerializeField] bool alive = false;
     
 
     public void Init(PlayerProfile profile, PEntity entity)
@@ -60,5 +60,15 @@ public class TopChar : MonoBehaviour
             return coreChar;
         }
         return null;
+    }
+
+    public void SetAlive(bool t)
+    {
+        this.alive = t;
+    }
+
+    public bool GetAlive()
+    {
+        return alive;
     }
 }

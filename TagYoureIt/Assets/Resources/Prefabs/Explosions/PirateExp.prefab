@@ -53,7 +53,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8792114322255440957, guid: b28a271bfdaaa0845b705cda600737f8, type: 3}
       propertyPath: m_Name
-      value: ExpRoot
+      value: PirateExp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b28a271bfdaaa0845b705cda600737f8, type: 3}
