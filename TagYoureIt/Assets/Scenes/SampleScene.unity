@@ -3425,6 +3425,7 @@ MonoBehaviour:
   characterAttributes: {fileID: 0}
   coreChar: {fileID: 0}
   isYou: 0
+  alive: 0
 --- !u!95 &1083778983
 Animator:
   serializedVersion: 3
@@ -3993,6 +3994,7 @@ MonoBehaviour:
   loop: {fileID: 1778167113}
   pm: {fileID: 511608085}
   UI: {fileID: 348690630}
+  music: {fileID: 0}
 --- !u!1 &1236554701
 GameObject:
   m_ObjectHideFlags: 0
@@ -7187,6 +7189,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1865001622}
   - component: {fileID: 1865001623}
+  - component: {fileID: 1865001624}
+  - component: {fileID: 1865001625}
   m_Layer: 0
   m_Name: MUSIC
   m_TagString: Untagged
@@ -7304,6 +7308,49 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!169 &1865001624
+AudioLowPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865001621}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_LowpassResonanceQ: 1
+  lowpassLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1865001625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865001621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aa38dcaad0a1454e952a277c637127d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 1865001623}
+  clips:
+  - {fileID: 8300000, guid: 5a9969428efb44145aac15ebd574cc81, type: 3}
+  volumeMultiplier: 0.25
+  ppKey: mVol
+  alpf: {fileID: 1865001624}
 --- !u!1 &1873750781
 GameObject:
   m_ObjectHideFlags: 0

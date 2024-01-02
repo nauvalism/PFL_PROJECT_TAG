@@ -9,6 +9,7 @@ public class GameplayController : MonoBehaviour
     [SerializeField] LoopManager loop;
     [SerializeField] PlayerManager pm;
     [SerializeField] UIManager UI;
+    [SerializeField] MusicManager music;
     private void Awake() {
         instance = this;
     }
@@ -34,6 +35,7 @@ public class GameplayController : MonoBehaviour
         if(die)
         {
             loop.ChangeGameState(GameState.calculating);
+            music.FadeOut(null, 2.0f);
         }
         else
         {

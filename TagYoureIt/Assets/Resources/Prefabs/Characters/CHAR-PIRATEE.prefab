@@ -11,34 +11,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CHAR-PIRATEE
       objectReference: {fileID: 0}
-    - target: {fileID: 5085672877950100956, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: m_Volume
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5085672877950100956, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: m_PlayOnAwake
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6263200527408958991, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: col
-      value: 
-      objectReference: {fileID: 2012381086497872122}
-    - target: {fileID: 6584522368157230226, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: metaPlayer.exp
-      value: 250
-      objectReference: {fileID: 0}
-    - target: {fileID: 6584522368157230226, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: metaPlayer.userID
-      value: 112123
-      objectReference: {fileID: 0}
-    - target: {fileID: 6584522368157230226, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: characterAttributes
-      value: 
-      objectReference: {fileID: 11400000, guid: 5eb1494002cdc6143bb7fc5c00aa3b21, type: 2}
-    - target: {fileID: 6584522368157230226, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-      propertyPath: metaPlayer.nickName
-      value: Test Player
-      objectReference: {fileID: 0}
     - target: {fileID: 7535947480378374434, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -85,8 +57,3 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
---- !u!61 &2012381086497872122 stripped
-BoxCollider2D:
-  m_CorrespondingSourceObject: {fileID: 5578282501573381976, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
-  m_PrefabInstance: {fileID: 6235061674788034466}
-  m_PrefabAsset: {fileID: 0}
