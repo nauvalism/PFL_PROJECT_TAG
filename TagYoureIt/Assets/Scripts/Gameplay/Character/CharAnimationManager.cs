@@ -84,7 +84,7 @@ public class CharAnimationManager : MonoBehaviour
         move = false;
         rootAnim.Play(_name,-1,0);
         AnimatorClipInfo[] currInfo = rootAnim.GetCurrentAnimatorClipInfo(0);
-        Debug.Log("Animation duration : "+currInfo[0].clip.length);
+        //Debug.Log("Animation duration : "+currInfo[0].clip.length);
         return currInfo[0].clip.length;
     
     }

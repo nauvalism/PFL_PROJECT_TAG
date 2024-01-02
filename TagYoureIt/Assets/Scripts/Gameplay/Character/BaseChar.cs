@@ -32,6 +32,7 @@ public class BaseChar : MonoBehaviour
     
     [Header("Ground and Jump")]
     [SerializeField] bool grounded = true;
+    [SerializeField] bool launched = false;
     [SerializeField] GameObject groundCheckRoot;
     [SerializeField] Transform groundCheckF;
     [SerializeField] Transform groundCheck;
@@ -48,6 +49,7 @@ public class BaseChar : MonoBehaviour
     [SerializeField] BaseCharSkill charSkill;
     [SerializeField] InteractionSensor iSensor;
     [SerializeField] Explosion explo;
+    [SerializeField] SoundManager impactSounds;
     
     
     public virtual void InitializeIdentity(PlayerIdentity iden, int _order)
@@ -289,8 +291,9 @@ public class BaseChar : MonoBehaviour
         Vector2 _force;
         Vector2 _dir = bc.GetPosition() - (Vector2)rootActorMovement.position;
         _dir.Normalize();
-        _force = new Vector2(_dir.x * 10, 0);
-        bc.Launch(_force);
+        _force = new Vector2(_dir.x * 10, 10);
+        _force.Normalize();
+        bc.Launch(_force, 250);
         bomb.GiveBomb();
         bc.ReceiveBomb();
         bc.Hit();
@@ -328,6 +331,7 @@ public class BaseChar : MonoBehaviour
         rb.sharedMaterial = bounceMat;
         rb.AddForce(_f * 75);
         iSensor.DisableCol();
+        launched = true;
         StopCoroutine("Recovery");
         StartCoroutine(Recovery());
         // LeanTween.value(rootActorMovement.gameObject, rb.velocity.x, .0f, 5.0f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
@@ -349,6 +353,7 @@ public class BaseChar : MonoBehaviour
         rb.sharedMaterial = bounceMat;
         rb.AddForce(_f * multiplier);
         iSensor.DisableCol();
+        launched = true;
         StopCoroutine(Recovery());
         if(!dead)
             StartCoroutine(Recovery());
@@ -372,6 +377,7 @@ public class BaseChar : MonoBehaviour
         movementAttributes.controllable = true;
         animManager.Move();
         animManager.PlayNonMovementAnim("Idle");
+        launched = false;
     }
 
     public void Explode()
@@ -414,9 +420,24 @@ public class BaseChar : MonoBehaviour
         animManager.UnMove();
     }
 
+    public void HitWall()
+    {
+        //Debug.Log("Hit Wall");
+        
+
+        if(root.GetAlive())
+        {
+            impactSounds.PlayRandomBetween(0,2);
+            animManager.PlayAnimAbsolutely("Hit");
+        }
+            
+    }
+
     public void Hit()
     {
-        animManager.PlayAnimAbsolutely("Hit");
+        if(root.GetAlive())
+            animManager.PlayAnimAbsolutely("Hit");
+        //impactSounds.Play(0);
     }
 
     public void HitDead()
@@ -432,10 +453,6 @@ public class BaseChar : MonoBehaviour
     public virtual void DisableMovement()
     {
         movementAttributes.controllable = false;
-    }
-
-    public void OnTriggerEnter2D(Collider2D other) {
-        
     }
 
     public Vector2 GetPosition()
@@ -456,6 +473,30 @@ public class BaseChar : MonoBehaviour
     public bool Bombed()
     {
         return bomb.GetBombed();
+    }
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    private void OnCollisionEnter2D(Collision2D other) {
+        Debug.Log("Collide With : "+other.collider.tag);
+        if(other.collider.CompareTag("Ground"))
+        {
+            if(launched)
+            {
+                Debug.Log("Collide With Wall");
+                HitWall();
+            }
+        }
     }
 }
 

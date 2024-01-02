@@ -95,7 +95,7 @@ public class PlayerManager : MonoBehaviour
 
     public bool IsYou(PEntity credential)
     {
-        Debug.Log("Isyou ? : "+credential.GetID() + "-"+yourEntity.GetID());
+        //Debug.Log("Isyou ? : "+credential.GetID() + "-"+yourEntity.GetID());
         if(credential.identity.yourID == yourEntity.GetID())
         {
             return true;

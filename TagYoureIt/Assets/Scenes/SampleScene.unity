@@ -3994,7 +3994,7 @@ MonoBehaviour:
   loop: {fileID: 1778167113}
   pm: {fileID: 511608085}
   UI: {fileID: 348690630}
-  music: {fileID: 0}
+  music: {fileID: 1865001625}
 --- !u!1 &1236554701
 GameObject:
   m_ObjectHideFlags: 0
@@ -7704,6 +7704,7 @@ MonoBehaviour:
     controllable: 1
     running: 0
   grounded: 0
+  launched: 0
   groundCheckRoot: {fileID: 384773508}
   groundCheckF: {fileID: 1334279106}
   groundCheck: {fileID: 2016807117}
@@ -7723,6 +7724,7 @@ MonoBehaviour:
   charSkill: {fileID: 0}
   iSensor: {fileID: 1817988016}
   explo: {fileID: 0}
+  impactSounds: {fileID: 0}
 --- !u!114 &1906645334
 MonoBehaviour:
   m_ObjectHideFlags: 0

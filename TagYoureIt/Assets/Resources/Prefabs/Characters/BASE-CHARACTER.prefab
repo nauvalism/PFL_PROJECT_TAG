@@ -273,6 +273,7 @@ MonoBehaviour:
     controllable: 1
     running: 0
   grounded: 0
+  launched: 0
   groundCheckRoot: {fileID: 3206770667833337774}
   groundCheckF: {fileID: 1086803823425465352}
   groundCheck: {fileID: 871455405168934524}
@@ -292,6 +293,7 @@ MonoBehaviour:
   charSkill: {fileID: 0}
   iSensor: {fileID: 9125517033649489457}
   explo: {fileID: 1739586939061015939}
+  impactSounds: {fileID: 2080042420796872751}
 --- !u!114 &7671580446660259811
 MonoBehaviour:
   m_ObjectHideFlags: 0
