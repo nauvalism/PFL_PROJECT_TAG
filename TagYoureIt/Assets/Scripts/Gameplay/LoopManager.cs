@@ -17,6 +17,7 @@ public class LoopManager : MonoBehaviour
 {
     [SerializeField] GameState gameState;
     [SerializeField] OpeningUI openingUI;
+    [SerializeField] ResultUI result;
     
     
 
@@ -24,6 +25,11 @@ public class LoopManager : MonoBehaviour
     {
         ChangeGameState(GameState.opening);
         openingUI.OpeningUISequence(next);
+    }
+
+    public void Resulting(PEntity whoWins)
+    {
+        result.Resulting(whoWins.GetCSD().chosenCharacterID, whoWins.profile.nickName);
     }
 
     public void ChangeGameState(GameState to)

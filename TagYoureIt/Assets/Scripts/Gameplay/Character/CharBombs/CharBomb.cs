@@ -90,6 +90,7 @@ public class CharBomb : MonoBehaviour
         LeanTween.cancel(bombRoot.gameObject);
         bombRoot.transform.localScale = Vector3.one;
         LeanTween.scale(bombRoot.gameObject, Vector3.zero, 0.25f).setEase(LeanTweenType.easeOutQuad);
+        clips.StopClip();
         anim.Play("Idle");
     }
 

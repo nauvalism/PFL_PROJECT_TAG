@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    [Header("Characters")]
+    [SerializeField] List<GameObject> characters;
+
+    [Header("Identities")]
     [SerializeField] PlayerEntity yourEntity;
     [SerializeField] List<PEntity> players;
     [SerializeField] List<TopChar> allPlayersChars;
@@ -14,6 +18,8 @@ public class PlayerManager : MonoBehaviour
         {
             allPlayersChars = new List<TopChar>(FindObjectsOfType<TopChar>());
         }
+
+        characters = new List<GameObject>(Resources.LoadAll<GameObject>("Prefabs/Characters/Chars"));
     }
 
 
@@ -24,9 +30,50 @@ public class PlayerManager : MonoBehaviour
         }    
     }
 
-    public void FillUniqueEntity(PlayerEntity entity)
+    public void ResetCoreAttribute(int amount)
     {
+        allPlayersChars = new List<TopChar>();
+        players = new List<PEntity>();
+        for(int i = 0 ; i < amount ; i++)
+        {
+            players.Add(new PEntity());
+            allPlayersChars.Add(null);
+        }
 
+    }
+
+    public void PutPlayerCredentials(List<PlayerProfile> profile, List<Identities> identity, List<CharacterSelectionData> csd)
+    {
+        for(int i = 0 ; i < profile.Count ; i++)
+        {
+            players[i].SetPlayerProfile(profile[i]);
+            players[i].SetID(identity[i]);
+            players[i].SetSelection(csd[i]);
+        }
+
+        InitAllPlayers();
+    }
+
+    public void PutPlayerCredentials(int order, PlayerProfile profile, Identities identity, CharacterSelectionData csd)
+    {
+        players[order].SetPlayerProfile(profile);
+        players[order].SetID(identity);
+        players[order].SetSelection(csd);
+    }
+
+    public void FillUniqueEntity(int yourOrder)
+    {
+        yourEntity = new PlayerEntity(players[yourOrder]);
+    }
+
+    public void SpawnPlayersLocal()
+    {
+        for(int i = 0 ; i < players.Count; i++)
+        {
+            GameObject ii;
+            ii = (GameObject)Instantiate(characters[players[i].csd.chosenCharacterID], GameplayController.instance.GetSpawnPlace(players[i].identity.yourOrder).position, Quaternion.identity);
+            allPlayersChars[i] = ii.GetComponent<TopChar>();
+        }
     }
 
     public void InitAllPlayers()
@@ -85,6 +132,19 @@ public class PlayerManager : MonoBehaviour
         for(int i = 0 ; i < players.Count ;  i++)
         {
             if(players[i].GetID() == identity)
+            {
+                return players[i];
+            }
+        }
+
+        return null;
+    }
+
+    public PEntity GetOppositePlayer(PlayerIdentity identity)
+    {
+        for(int i = 0 ; i < players.Count ;  i++)
+        {
+            if(players[i].GetID() != identity)
             {
                 return players[i];
             }
@@ -187,7 +247,7 @@ public class PEntity
 
     public PEntity()
     {
-        mainLives = 3;
+        mainLives = 1;
         try
         {
             lives = new List<int>();
@@ -203,6 +263,13 @@ public class PEntity
         
     }
 
+    public void SetPlayerProfile(PlayerProfile prof)
+    {
+        this.profile = new PlayerProfile(prof);
+    }
+
+    
+
     public bool DecreaseLive()
     {
         mainLives--;
@@ -216,10 +283,22 @@ public class PEntity
         return (lives[which] == 0);
     }
 
+    public void SetID(Identities ide)
+    {
+        identity = new Identities(ide);
+    }
+
     public void SetID(PlayerIdentity _id, int _order)
     {
         identity = new Identities();
         identity.SetID(_id,_order);
+    }
+
+    public void SetSelection(CharacterSelectionData _csd)
+    {
+        this.csd = new CharacterSelectionData();
+        this.csd.chosenCharacterID = _csd.chosenCharacterID;
+        
     }
 
     public PlayerIdentity GetID()
