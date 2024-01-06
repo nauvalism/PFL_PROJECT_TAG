@@ -10,15 +10,13 @@ public class GameplayController : MonoBehaviour
     [SerializeField] PlayerManager pm;
     [SerializeField] UIManager UI;
     [SerializeField] MusicManager music;
+    [SerializeField] BaseMap currentMap;
     private void Awake() {
         instance = this;
     }
 
     private void Start() {
-        loop.Intro(()=>{
-            SetState(GameState.midGame);
-            GachaBomb();
-        });
+        
         //GachaBomb();
     }
 
@@ -27,7 +25,43 @@ public class GameplayController : MonoBehaviour
         return pm;
     }
 
+    public void PlayMusic()
+    {
+        music.Play(0);
+    }
 
+    public void InitAllPlayers()
+    {
+        pm.InitAllPlayers();
+    }
+
+    public void ResetAllCoreAttribute()
+    {
+        pm.ResetCoreAttribute(2);
+    }
+
+    public void PutPlayerCredentials(List<PlayerProfile> profile, List<Identities> identity, List<CharacterSelectionData> csd)
+    {
+        pm.PutPlayerCredentials(profile, identity, csd);
+    }
+
+    public void PutPlayerCredentials(int order, PlayerProfile profile, Identities identity, CharacterSelectionData csd)
+    {
+        pm.PutPlayerCredentials(order, profile, identity, csd);
+    }
+
+    public void SpawnPlayersLocal()
+    {
+        pm.SpawnPlayersLocal();
+    }
+
+    public void GameIntro()
+    {
+        loop.Intro(()=>{
+            SetState(GameState.midGame);
+            GachaBomb();
+        });
+    }
 
     public bool Explode(PlayerIdentity who)
     {
@@ -35,7 +69,9 @@ public class GameplayController : MonoBehaviour
         if(die)
         {
             loop.ChangeGameState(GameState.calculating);
-            music.FadeOut(null, 2.0f);
+            music.FadeOut(()=>{
+                loop.Resulting(GetOppositePlayer(who));
+            }, 2.0f);
         }
         else
         {
@@ -47,9 +83,9 @@ public class GameplayController : MonoBehaviour
 
 
 
-    public void FillUniqueEntity(PlayerEntity entity)
+    public void FillUniqueEntity(int yourOrder)
     {
-        this.pm.FillUniqueEntity(entity);
+        this.pm.FillUniqueEntity(yourOrder);
     }
 
     public void FadeTaggable(System.Action during, System.Action after)
@@ -72,6 +108,16 @@ public class GameplayController : MonoBehaviour
         pm.GachaBomb();
     }
 
+    public PEntity GetPlayer(PlayerIdentity identity)
+    {
+        return pm.GetPlayer(identity);
+    }
+
+    public PEntity GetOppositePlayer(PlayerIdentity identity)
+    {
+        return pm.GetOppositePlayer(identity);
+    }
+
     public bool IsYou(PEntity credential)
     {
         return pm.IsYou(credential);
@@ -86,5 +132,10 @@ public class GameplayController : MonoBehaviour
     public GameState GetState()
     {
         return loop.GetGameState();
+    }
+
+    public Transform GetSpawnPlace(int index)
+    {
+        return currentMap.GetSpawnPlace(index);
     }
 }

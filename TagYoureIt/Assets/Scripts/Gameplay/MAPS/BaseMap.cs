@@ -6,7 +6,7 @@ public class BaseMap : MonoBehaviour
 {
     [SerializeField] string mapCodeName;
     [SerializeField] List<BaseObject> uninterractableObjects;
-
+    [SerializeField] List<Transform> spawnPlaces;
 
     protected virtual void OnValidate()
     {
@@ -31,5 +31,10 @@ public class BaseMap : MonoBehaviour
     public string GetCodeName()
     {
         return mapCodeName;
+    }
+
+    public Transform GetSpawnPlace(int index)
+    {
+        return spawnPlaces[index];
     }
 }

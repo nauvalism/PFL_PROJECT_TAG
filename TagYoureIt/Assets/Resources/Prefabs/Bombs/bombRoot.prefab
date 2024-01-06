@@ -160,6 +160,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coreChar: {fileID: 0}
   anim: {fileID: 8837497693595508957}
+  clips: {fileID: 315111340263754918}
   bombed: 0
   maxCountDown: 5
   countDown: 5
@@ -327,6 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f378304e8a08e504e81fe066cebad8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  source: {fileID: 606129976760212134}
   clips:
   - {fileID: 8300000, guid: ed98bd6cf09a03343a10613066b45ca3, type: 3}
   - {fileID: 8300000, guid: 4564608ed2c89cc4ba2f48c0c23d8331, type: 3}

@@ -4,16 +4,39 @@ using UnityEngine;
 
 public class PlayerEntity : MonoBehaviour
 {
+    [SerializeField] Identities yourID;
     [SerializeField] PEntity detailEntity;
-    [SerializeField] CharacterSelectionData csd;
 
     private void Awake() {
         
     }
 
+    public PlayerEntity()
+    {
+        
+    }
+
+    public PlayerEntity(PEntity entity)
+    {
+        this.detailEntity = entity;
+        this.yourID = entity.identity;
+    }
+
+    public PlayerEntity(PlayerProfile prof, Identities identity)
+    {
+        
+    }
+
+
     public void SetDetailData(PlayerProfile prof)
     {
         detailEntity.profile = new PlayerProfile(prof);
+    }
+
+    public void SetID(Identities id)
+    {
+        detailEntity.identity = new Identities();
+        detailEntity.identity.SetID(id.yourID,id.yourOrder);
     }
 
     public void SetID(PlayerIdentity _id, int _order)
@@ -37,10 +60,6 @@ public class PlayerEntity : MonoBehaviour
         return detailEntity.identity;
     }
 
-    public CharacterSelectionData GetCSD()
-    {
-        return csd;
-    }
 }
 
 
