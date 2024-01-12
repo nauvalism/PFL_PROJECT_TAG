@@ -62,6 +62,11 @@ public class TopChar : MonoBehaviour
         return null;
     }
 
+    public BaseChar GetCoreChar()
+    {
+        return coreChar;
+    }
+
     public void SetAlive(bool t)
     {
         this.alive = t;

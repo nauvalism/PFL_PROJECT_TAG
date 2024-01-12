@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Realtime;
+using Photon.Pun;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : MonoBehaviourPunCallbacks
 {
     [Header("Characters")]
     [SerializeField] List<GameObject> characters;
@@ -40,6 +42,17 @@ public class PlayerManager : MonoBehaviour
             allPlayersChars.Add(null);
         }
 
+    }
+
+    public void PutPlayerCredentials(List<PEntity> raw)
+    {
+        for(int i = 0 ; i < raw.Count ; i++)
+        {
+            players[i] = new PEntity();
+            players[i] = raw[i];
+        }
+
+        //InitAllPlayers();
     }
 
     public void PutPlayerCredentials(List<PlayerProfile> profile, List<Identities> identity, List<CharacterSelectionData> csd)
@@ -85,7 +98,14 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-
+    public void AssignViewIds(List<int> vals)
+    {
+        List<BaseChar> cores = GetAllChars();
+        for(int i = 0 ; i < cores.Count ; i++)
+        {
+            cores[i].GetComponent<PhotonView>().ViewID = vals[i];
+        }
+    }
 
     public void GachaBomb()
     {
@@ -121,6 +141,10 @@ public class PlayerManager : MonoBehaviour
         return players[who].DecreaseLive(which);
     }
 
+    public PEntity GetYou()
+    {
+        return yourEntity.GetEntity();
+    }
 
     public PEntity GetPlayer(int order)
     {
@@ -175,6 +199,18 @@ public class PlayerManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public List<BaseChar> GetAllChars()
+    {
+        List<BaseChar> result = new List<BaseChar>();
+        for(int i = 0 ; i < allPlayersChars.Count ; i++)
+        {
+            BaseChar res = allPlayersChars[i].GetCoreChar();
+            result.Add(res);
+        }
+
+        return result;
     }
 
 }
@@ -301,6 +337,11 @@ public class PEntity
         
     }
 
+    public string GetUserID()
+    {
+        return profile.userID;
+    }
+
     public PlayerIdentity GetID()
     {
         return identity.yourID;
@@ -319,5 +360,15 @@ public class PEntity
     public CharacterSelectionData GetCSD()
     {
         return csd;
+    }
+
+    public bool IsYou(string id)
+    {
+        if(profile.userID == id)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

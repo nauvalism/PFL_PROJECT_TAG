@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class GameplayController : MonoBehaviour
 {
@@ -39,6 +42,11 @@ public class GameplayController : MonoBehaviour
     {
         pm.ResetCoreAttribute(2);
     }
+    
+    public void PutPlayerCredentials(List<PEntity> raws)
+    {
+        pm.PutPlayerCredentials(raws);
+    }
 
     public void PutPlayerCredentials(List<PlayerProfile> profile, List<Identities> identity, List<CharacterSelectionData> csd)
     {
@@ -50,16 +58,52 @@ public class GameplayController : MonoBehaviour
         pm.PutPlayerCredentials(order, profile, identity, csd);
     }
 
-    public void SpawnPlayersLocal()
+    public void AssignViewIds(List<int> vids)
+    {
+        pm.AssignViewIds(vids);
+    }
+
+    public void SpawnPlayersLocal(bool multi = false)
     {
         pm.SpawnPlayersLocal();
+        if(multi)
+        {
+            List<object> param = new List<object>();
+            param.Add(pm.GetYou().GetUserID());
+            GPListener.instance.RaiseEvent(1, Photon.Realtime.ReceiverGroup.MasterClient, Photon.Realtime.EventCaching.DoNotCache, param.ToArray());
+        }
     }
+
+    #region ACTIONS
+
+    public void DoActions(ActionList actionList)
+    {
+        switch(actionList)
+        {
+            case ActionList.Start_Game : 
+                
+            break;
+
+            case ActionList.End_Game : 
+
+            break;
+        }
+    }
+
+    #endregion
 
     public void GameIntro()
     {
         loop.Intro(()=>{
             SetState(GameState.midGame);
             GachaBomb();
+        });
+    }
+
+    public void IntroMultiplayer()
+    {
+        loop.Intro(()=>{
+            GPListener.instance.EnableAllControls();
         });
     }
 
@@ -108,6 +152,11 @@ public class GameplayController : MonoBehaviour
         pm.GachaBomb();
     }
 
+    public List<BaseChar> GetPlayerCharacters()
+    {
+        return pm.GetAllChars();
+    }
+
     public PEntity GetPlayer(PlayerIdentity identity)
     {
         return pm.GetPlayer(identity);
@@ -137,5 +186,32 @@ public class GameplayController : MonoBehaviour
     public Transform GetSpawnPlace(int index)
     {
         return currentMap.GetSpawnPlace(index);
+    }
+
+
+
+
+
+
+    public PEntity ByteToEntity(byte[] Data)
+    {
+        PEntity result = new PEntity();
+        
+        if (Data != null && Data.Length > 0)
+        {
+            BinaryFormatter BF = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            ms.Write(Data, 0, Data.Length);
+            ms.Seek(0, SeekOrigin.Begin);
+            result = (PEntity)BF.Deserialize(ms);
+            return result;
+        }
+        else
+        {
+            //SelectChar(0);
+            //GPGHelper.Instance.OpenSave (true);
+            //MenuController.Instance.FillDatas (true);
+            return result;
+        }
     }
 }

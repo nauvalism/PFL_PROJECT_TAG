@@ -9,7 +9,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2430235830920794193, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
       propertyPath: m_Name
-      value: CHAR-PIRATEE
+      value: 00.CHAR-PIRATEE
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865512300952622571, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
+      propertyPath: sceneViewId
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865512300952622571, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
+      propertyPath: observableSearch
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7535947480378374434, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
       propertyPath: m_RootOrder
