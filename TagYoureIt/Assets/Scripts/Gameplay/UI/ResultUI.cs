@@ -62,6 +62,10 @@ public class ResultUI : MonoBehaviour
             cg.alpha = f;
         }).setEase(LeanTweenType.easeOutQuad).setOnComplete(()=>{
             	Destroy(spawned);
+                if(GameplayController.instance.isMultiplayer)
+                {
+                    GameplayController.instance.ResetGameplay();
+                }
         });
     }
 }

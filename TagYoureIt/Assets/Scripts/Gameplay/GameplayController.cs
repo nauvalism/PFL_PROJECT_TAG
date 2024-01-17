@@ -4,16 +4,24 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class GameplayController : MonoBehaviour
 {
     public static GameplayController instance {get;set;}
+    
+    [Header("Debug UI")]
+    [SerializeField] DebugGameplayUI debugUI;
+
+    [Header("Main Attributes")]
     [SerializeField] ScoreManager score;
     [SerializeField] LoopManager loop;
     [SerializeField] PlayerManager pm;
     [SerializeField] UIManager UI;
     [SerializeField] MusicManager music;
     [SerializeField] BaseMap currentMap;
+    public bool isMultiplayer;
     private void Awake() {
         instance = this;
     }
@@ -41,6 +49,52 @@ public class GameplayController : MonoBehaviour
     public void ResetAllCoreAttribute()
     {
         pm.ResetCoreAttribute(2);
+    }
+
+    public void ResetGameplay()
+    {
+        if(isMultiplayer)
+        {
+            PhotonNetwork.LeaveLobby();
+            PhotonNetwork.LeaveRoom();
+        }
+        else
+        {
+            DestroyAll();
+        }
+    }
+
+    public void DestroyAll(bool resetting = true)
+    {
+        
+        StartCoroutine(DestroyingAll());
+        IEnumerator DestroyingAll()
+        {
+            List<BaseChar> allPlayers = pm.GetAllChars();
+            for(int i = 0 ; i < allPlayers.Count ; i++)
+            {
+                TopChar t = allPlayers[i].GetRoot();
+                if(isMultiplayer)
+                    PhotonNetwork.Destroy(t.gameObject);
+                else
+                    Destroy(t.gameObject);
+            }
+
+            if(resetting)
+            {
+                if(isMultiplayer)
+                {
+                    yield return new WaitForSeconds(1.0f);
+                    //PhotonController.instance.FillCredentialAndJoinLobby();
+                }
+                else
+                {
+                    debugUI.ShowUI();
+                }
+            }
+        }
+
+        
     }
     
     public void PutPlayerCredentials(List<PEntity> raws)
@@ -76,16 +130,17 @@ public class GameplayController : MonoBehaviour
 
     #region ACTIONS
 
-    public void DoActions(ActionList actionList)
+    public void DoActions(ActionList actionList, object[] param = null)
     {
         switch(actionList)
         {
             case ActionList.Start_Game : 
-                
+                GPListener.instance.GameIntro();
             break;
 
             case ActionList.End_Game : 
-
+                int _whoWins = (int)param[0];
+                loop.Resulting(pm.GetPlayer(_whoWins));
             break;
         }
     }
@@ -95,16 +150,76 @@ public class GameplayController : MonoBehaviour
     public void GameIntro()
     {
         loop.Intro(()=>{
-            SetState(GameState.midGame);
-            GachaBomb();
+            pm.InitAllPlayers();
         });
     }
 
     public void IntroMultiplayer()
     {
+        SetMultiplayer(true);
+        pm.InitAllPlayers();
         loop.Intro(()=>{
             GPListener.instance.EnableAllControls();
         });
+    }
+
+    public void EnableAllControl()
+    {
+        SetState(GameState.midGame);
+        //pm.GachaBombMultiplayer();
+        if(PhotonNetwork.IsMasterClient)
+            GachaBombMultiplayer();
+        //GachaBomb();
+    }
+
+    public void DisableAllControl()
+    {
+        SetState(GameState.calculating);
+    }
+
+    public void GachaBombMultiplayer()
+    {
+        List<PEntity> p = pm.GetPlayers();
+        List<int> exceptions = new List<int>();
+        for(int i = 0 ; i < pm.GetPlayers().Count; i++)
+        {
+            if(p[i].GetHP() <= 0)
+            {
+                exceptions.Add(i);
+            }
+        }
+
+
+        int whoBomb = UnityEngine.Random.Range(0,p.Count);
+
+        if(exceptions.Count > 0)
+        {
+            while(ContainsInException())
+            {
+                whoBomb = UnityEngine.Random.Range(0,p.Count);
+            }
+        }
+
+        pm.GiveBomb(whoBomb);
+
+        bool ContainsInException()
+            {
+                for(int i = 0 ; i < exceptions.Count ; i++)
+                {
+                    if(whoBomb == exceptions[i])
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+    }
+
+    public List<int> DecreaseHealth(int who)
+    {
+        return pm.DecreaseLiveMultiplayer(who);
     }
 
     public bool Explode(PlayerIdentity who)
@@ -125,6 +240,50 @@ public class GameplayController : MonoBehaviour
         return die;
     }
 
+    public void Explode(PlayerIdentity who, bool dead, bool multiplayer = false)
+    {
+        pm.GetChar((int)who).ExplodeEffect(dead);
+        if(dead)
+        {
+            DisableAllControl();
+            loop.ChangeGameState(GameState.calculating);
+            music.FadeOut(()=>{
+                if(multiplayer)
+                {
+                    if(PhotonNetwork.IsMasterClient)
+                    {
+                        GPListener.instance.RaiseEvent(8, ReceiverGroup.MasterClient, EventCaching.DoNotCache, (int)who);
+                    }
+                }
+                else
+                {
+                    loop.Resulting(GetOppositePlayer(who));
+                }
+                
+            }, 2.0f);
+        }
+        else
+        {
+
+            StartCoroutine(GachaNext());
+            IEnumerator GachaNext()
+            {
+                yield return new WaitForSeconds(1.0f);
+                List<int> exception = new List<int>(pm.GetDead());
+                List<object> param = new List<object>();
+                param.Add(pm.GetPlayers().Count);
+                param.Add(exception.ToArray());
+                if(PhotonNetwork.IsMasterClient)
+                {
+                    GPListener.instance.RaiseEvent(4, ReceiverGroup.MasterClient, EventCaching.DoNotCache, param.ToArray());
+                }
+                
+            }
+            
+        }
+        
+    }
+
 
 
     public void FillUniqueEntity(int yourOrder)
@@ -142,14 +301,41 @@ public class GameplayController : MonoBehaviour
         UI.UnFadeTag(during, after);
     }
 
+    public void UpdateLive()
+    {
+        List<PEntity> p = pm.GetPlayers();
+        for(int i = 0 ; i < p.Count ; i++)
+        {
+            UI.UpdateLive((PlayerIdentity)i, p[i].GetHP());
+        }
+    }
+
     public void UpdateLive(PlayerIdentity who, int live)
     {
         UI.UpdateLive(who, live);
     }
 
+    public void UpdateLive(List<int> lives)
+    {
+        for(int i = 0 ; i < lives.Count ; i++)
+        {
+            UI.UpdateLive((PlayerIdentity)i, lives[i]);
+        }
+    }
+
     public void GachaBomb()
     {
         pm.GachaBomb();
+    }
+
+    public void GachaBomb(int who)
+    {
+        pm.GachaBomb(who);
+    }
+
+    public BaseChar GetPlayerCharacter(int who)
+    {
+        return pm.GetChar(who);
     }
 
     public List<BaseChar> GetPlayerCharacters()
@@ -189,7 +375,15 @@ public class GameplayController : MonoBehaviour
     }
 
 
+    public void SetMultiplayer(bool stat)
+    {
+        this.isMultiplayer = stat;
+    }
 
+    public bool IsMultiplayer()
+    {
+        return this.isMultiplayer;
+    }
 
 
 

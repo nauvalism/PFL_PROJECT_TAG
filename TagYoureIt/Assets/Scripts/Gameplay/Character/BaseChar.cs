@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using SimpleJSON;
 using TMPro;
+using ExitGames.Client.Photon;
+using Photon.Realtime;
+using Photon.Pun;
 
 public enum PlayerIdentity
 {
@@ -12,7 +15,7 @@ public enum PlayerIdentity
     player_4 = 3
 }
 
-public class BaseChar : MonoBehaviour
+public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
 {
     [Header("IDENTITY")]
     [SerializeField] TopChar root;
@@ -89,8 +92,20 @@ public class BaseChar : MonoBehaviour
         
         if(movementAttributes.controllable)
         {
-            movement.x = Input.GetAxisRaw(keys.moveKey);
-            movement.y = Input.GetAxisRaw(keys.jumpkey);
+            if(GameplayController.instance.IsMultiplayer())
+            {
+                if(base.photonView.IsMine)
+                {
+                    movement.x = Input.GetAxisRaw(keys.moveKey);
+                    movement.y = Input.GetAxisRaw(keys.jumpkey);
+                }
+            }
+            else
+            {
+                movement.x = Input.GetAxisRaw(keys.moveKey);
+                movement.y = Input.GetAxisRaw(keys.jumpkey);
+            }
+            
         
             //if(Input.GetKeyDown(KeyCode.LeftShift))
             if(Input.GetButtonDown(keys.run))
@@ -121,16 +136,18 @@ public class BaseChar : MonoBehaviour
                 Tag();
             }
 
-            if(movement.x > 0)
-            {
-                graphicRoot.transform.localScale = new Vector3(1.0f, graphicRoot.localScale.y, 0);
-            }
-            else if(movement.x < 0)
-            {
-                graphicRoot.transform.localScale = new Vector3(-1.0f, graphicRoot.localScale.y, 0);
-            }
+            
 
 
+        }
+
+        if(movement.x > 0)
+        {
+            graphicRoot.transform.localScale = new Vector3(1.0f, graphicRoot.localScale.y, 0);
+        }
+        else if(movement.x < 0)
+        {
+            graphicRoot.transform.localScale = new Vector3(-1.0f, graphicRoot.localScale.y, 0);
         }
     }
 
@@ -142,7 +159,17 @@ public class BaseChar : MonoBehaviour
         grounded = Physics2D.Linecast(groundCheckF.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
     
         Vector2 moveDirection = new Vector2(movement.x, 0).normalized;
-        rootActorMovement.Translate((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection);
+        if(GameplayController.instance.IsMultiplayer())
+        {
+            if(base.photonView.IsMine)
+            {
+                rootActorMovement.Translate((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection);
+            }
+        }
+        else
+        {
+            rootActorMovement.Translate((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection);
+        }
     
         if (!grounded)
         {
@@ -268,7 +295,20 @@ public class BaseChar : MonoBehaviour
         {
             Debug.Log("Tag Button not null");
             BaseChar ch = iSensor.GetInteractedChar();
-            TransferBomb((int)ch.GetID());
+            
+            if(GameplayController.instance.isMultiplayer)
+            {
+                List<object> param = new List<object>();
+                param.Add(root.GetOrder());
+                param.Add(ch.GetRoot().GetOrder());
+                GPListener.instance.RaiseEvent(9, ReceiverGroup.MasterClient, EventCaching.DoNotCache, param.ToArray());
+            }
+            else
+            {
+                TransferBombLocal((int)ch.GetID());
+            }
+            
+            
         }
         else
         {
@@ -282,11 +322,30 @@ public class BaseChar : MonoBehaviour
         bomb.ReceiveBomb();
     }
 
-    public virtual void TransferBomb(int who)
+    public virtual void GiveBomb()
+    {
+        iSensor.NullifyInteractedChar();
+        bomb.GiveBomb();
+    }
+
+    public virtual void TransferredBomb(Vector3 fromPos)
+    {
+        iSensor.NullifyInteractedChar();
+        Vector2 _force;
+        Vector2 _dir =  GetPosition() - (Vector2)fromPos;
+        _dir.Normalize();
+        _force = new Vector2(_dir.x * 10, 10);
+        _force.Normalize();
+        ReceiveBomb();
+        Hit();
+        Launch(_force, 250);
+    }
+
+    public virtual void TransferBombLocal(int who)
     {
         
 
-
+        
         BaseChar bc = GameplayController.instance.GetPM().GetChar(who);
         Vector2 _force;
         Vector2 _dir = bc.GetPosition() - (Vector2)rootActorMovement.position;
@@ -384,6 +443,55 @@ public class BaseChar : MonoBehaviour
     {
         
 
+        
+        
+        if(GameplayController.instance.isMultiplayer)
+        {
+            GameplayController.instance.SetState(GameState.processing);
+            List<object> param = new List<object>();
+            param.Add(root.GetOrder());
+            if(PhotonNetwork.IsMasterClient)
+            {
+                GPListener.instance.RaiseEvent(6, ReceiverGroup.MasterClient, EventCaching.DoNotCache, param.ToArray());
+            }
+            
+        }
+        else
+        {
+            Vector2 _force;
+            float x = 1;
+            if(Random.Range(0,2) == 0)
+            {
+                x = 1;
+            }
+            else
+            {
+                x = -1;
+            }
+            _force = new Vector2(x, 1);
+            _force.Normalize();
+            
+            explo.Explode();
+            Effects.instance.TriggerEffect(EffectList.camShake); 
+
+            if(GameplayController.instance.Explode(root.GetID()))
+            {
+                animManager.PlayAnimAbsolutely("DeadHit");
+                Launch(_force, 400, true);
+            }
+            else
+            {
+                animManager.PlayAnimAbsolutely("Hit");
+                Launch(_force, 300);
+            }
+        }
+        
+        
+        
+    }
+
+    public virtual void ExplodeEffect(bool dead)
+    {
         Vector2 _force;
         float x = 1;
         if(Random.Range(0,2) == 0)
@@ -399,17 +507,16 @@ public class BaseChar : MonoBehaviour
         
         explo.Explode();
         Effects.instance.TriggerEffect(EffectList.camShake); 
-        if(GameplayController.instance.Explode(root.GetID()))
+        if(dead)
         {
-            animManager.PlayAnimAbsolutely("DeadHit");
-            Launch(_force, 400, true);
-        }
-        else
-        {
-            animManager.PlayAnimAbsolutely("Hit");
-            Launch(_force, 300);
-        }
-        
+                animManager.PlayAnimAbsolutely("DeadHit");
+                Launch(_force, 400, true);
+            }
+            else
+            {
+                animManager.PlayAnimAbsolutely("Hit");
+                Launch(_force, 300);
+            }
     }
 
     public virtual void Stunned()
@@ -470,6 +577,11 @@ public class BaseChar : MonoBehaviour
         return root.GetID();
     }
 
+    public TopChar GetRoot()
+    {
+        return root;
+    }
+
     public bool Bombed()
     {
         return bomb.GetBombed();
@@ -496,6 +608,42 @@ public class BaseChar : MonoBehaviour
                 Debug.Log("Collide With Wall");
                 HitWall();
             }
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if(stream.IsWriting)
+        {
+            // List<object> toSend = new List<object>();
+            // toSend.Add(movement.x);
+            // toSend.Add(movementAttributes.running);
+            // toSend.Add(jump.jump);
+            // stream.SendNext(toSend.ToArray());
+            //Debug.Log("Sending : "+movement.x);
+            stream.SendNext(movement.x);
+            if(base.photonView.IsMine)
+            {
+                
+            }
+            
+        }
+        else if(stream.IsReading)
+        {
+            // List<object> received = new List<object>((object[])stream.ReceiveNext());
+            //     this.movement.x = (float)received[0];
+            //     this.movementAttributes.running = (bool)received[1];
+            //Debug.Log("Receiving : "+(float)stream.ReceiveNext());
+            float v = (float)stream.ReceiveNext();
+            //Debug.Log("Receiving : "+v);
+            movement.x = v;
+            
+            if(base.photonView.IsMine == false)
+            {
+                
+            }
+            
+            
         }
     }
 }

@@ -2111,6 +2111,7 @@ MonoBehaviour:
   players: []
   allPlayersChars: []
   debug: 1
+  nextBomb: 0
 --- !u!4 &511608086
 Transform:
   m_ObjectHideFlags: 0
@@ -4614,6 +4615,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1048881092}
   - component: {fileID: 1048881093}
+  - component: {fileID: 1048881094}
   m_Layer: 0
   m_Name: PhotonEventListener
   m_TagString: Untagged
@@ -4647,6 +4649,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca04e2dc3fbf4004bb52fd0e891fc83d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1048881094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048881091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 998
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1127620516
 GameObject:
   m_ObjectHideFlags: 0
@@ -5345,12 +5369,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b0cc6288d5706d4190b3d8130f03a0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugUI: {fileID: 0}
   score: {fileID: 943296777}
   loop: {fileID: 1778167113}
   pm: {fileID: 511608085}
   UI: {fileID: 348690630}
   music: {fileID: 1865001625}
   currentMap: {fileID: 1968136548}
+  isMultiplayer: 0
 --- !u!1 &1240816505
 GameObject:
   m_ObjectHideFlags: 0
@@ -5542,7 +5568,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1310659103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.5, y: 1, z: 0}
+  m_LocalPosition: {x: -1.71, y: -2.93, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2090146252}
@@ -6227,7 +6253,7 @@ MonoBehaviour:
     csd:
       chosenCharacterID: 0
       chosenCharacterIDs: 
-    mainLives: 3
+    mainLives: 1
     lives: 
 --- !u!4 &1438070503
 Transform:
@@ -6957,7 +6983,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1644204572}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: -0.17, z: 0}
+  m_LocalPosition: {x: 1.2, y: -2.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2090146252}

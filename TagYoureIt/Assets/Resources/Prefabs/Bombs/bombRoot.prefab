@@ -162,8 +162,8 @@ MonoBehaviour:
   anim: {fileID: 8837497693595508957}
   clips: {fileID: 315111340263754918}
   bombed: 0
-  maxCountDown: 5
-  countDown: 5
+  maxCountDown: 10
+  countDown: 10
   bombRoot: {fileID: 5173774279185084048}
   countDownScale: {fileID: 8732356663689256513}
   countDownTxt: {fileID: 5283869928901880103}

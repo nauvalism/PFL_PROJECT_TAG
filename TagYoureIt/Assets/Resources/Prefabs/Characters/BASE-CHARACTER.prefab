@@ -390,6 +390,7 @@ MonoBehaviour:
   observableSearch: 0
   ObservedComponents:
   - {fileID: 4895291264798110210}
+  - {fileID: 6263200527408958991}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -423,7 +424,7 @@ MonoBehaviour:
   snapScaleThreshold: 0
   positionLerpSpeed: 0.85
   rotationLerpSpeed: 0.85
-  scaleLerpSpeed: 0.85
+  scaleLerpSpeed: 0.15
   timeCorrectionSpeed: 0.1
   snapTimeThreshold: 0.3
   syncPosition: 0
@@ -438,7 +439,7 @@ MonoBehaviour:
   isAngularVelocityCompressed: 0
   automaticallyResetTime: 1
   isSmoothingAuthorityChanges: 0
-  whenToUpdateTransform: 0
+  whenToUpdateTransform: 1
   setVelocityInsteadOfPositionOnNonOwners: 0
   useLocalTransformOnly: 0
   maxPositionDifferenceForVelocitySyncing: 10
@@ -838,7 +839,7 @@ MonoBehaviour:
     csd:
       chosenCharacterID: 0
       chosenCharacterIDs: 
-    mainLives: 3
+    mainLives: 1
     lives: 
   characterAttributes: {fileID: 11400000, guid: 5eb1494002cdc6143bb7fc5c00aa3b21, type: 2}
   coreChar: {fileID: 6263200527408958991}

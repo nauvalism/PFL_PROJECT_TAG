@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DebugGameplayUI : MonoBehaviour
 {
+    
     [SerializeField] CanvasGroup mainCG;
     [SerializeField] GameObject mainDebugGameplay;
     [SerializeField] int you;
@@ -25,35 +26,41 @@ public class DebugGameplayUI : MonoBehaviour
         });
     }
 
-    public void HideUI()
+    public void HideUI(float duration, System.Action then)
     {
         LeanTween.cancel(mainCG.gameObject);
-        mainCG.interactable = true;
-        mainCG.blocksRaycasts = true;
-        LeanTween.value(mainCG.gameObject, 1.0f, .0f, 1.0f).setOnUpdate((float f)=>{
+        mainCG.interactable = false;
+        mainCG.blocksRaycasts = false;
+        LeanTween.value(mainCG.gameObject, 1.0f, .0f, duration).setOnUpdate((float f)=>{
             mainCG.alpha = f;
             
         }).setOnComplete(()=>{
             mainCG.interactable = false;
             mainCG.blocksRaycasts= false; 
+            then();
         });
     }
 
 
     public void StartLocal()
     {
-        GameplayController.instance.ResetAllCoreAttribute();
-        for(int i = 0 ; i < debugProfiles.Count ;i++)
-        {
-            GameplayController.instance.PutPlayerCredentials(i, debugProfiles[i], identities[i], csds[i]);
-        }
+        HideUI(0.5f, ()=>{
+            GameplayController.instance.ResetAllCoreAttribute();
+            for(int i = 0 ; i < debugProfiles.Count ;i++)
+            {
+                GameplayController.instance.PutPlayerCredentials(i, debugProfiles[i], identities[i], csds[i]);
+            }
+            
+
+
+            GameplayController.instance.SpawnPlayersLocal();
+            GameplayController.instance.InitAllPlayers();
+            GameplayController.instance.GameIntro();
+            GameplayController.instance.PlayMusic();
+            GameplayController.instance.FillUniqueEntity(you);
+        });
         
-        GameplayController.instance.SpawnPlayersLocal();
-        GameplayController.instance.InitAllPlayers();
-        GameplayController.instance.GameIntro();
-        GameplayController.instance.PlayMusic();
-        GameplayController.instance.FillUniqueEntity(you);
-        mainDebugGameplay.SetActive(false);
+        //mainDebugGameplay.SetActive(false);
     }
 
     public void StartQueue()
@@ -67,7 +74,10 @@ public class DebugGameplayUI : MonoBehaviour
 
         //GameplayController.instance.PutPlayerCredentials(a, debugProfiles[a], identities[a], csds[a]);
         //GameplayController.instance.FillUniqueEntity(you);
-        PhotonController.instance.JoinRandomRoom();
-        mainDebugGameplay.SetActive(false);
+        HideUI(0.5f, ()=>{
+            PhotonController.instance.JoinRandomRoom();
+        });
+        
+        //mainDebugGameplay.SetActive(false);
     }
 }

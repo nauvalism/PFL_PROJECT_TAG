@@ -8,9 +8,10 @@ public enum GameState
     preStart = 1,
     opening = 2,
     midGame = 3,
-    calculating = 4,
-    result = 5,
-    endGame = 6
+    processing = 4,
+    calculating = 5,
+    result = 6,
+    endGame = 7
 }
 
 public class LoopManager : MonoBehaviour

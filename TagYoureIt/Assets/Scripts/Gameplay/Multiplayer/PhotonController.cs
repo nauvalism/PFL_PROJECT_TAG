@@ -336,6 +336,12 @@ public class PhotonController : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         base.OnConnectedToMaster();
+        FillCredentialAndJoinLobby();
+    }
+
+    public void FillCredentialAndJoinLobby()
+    {
+        Debug.Log("Filling Credentials and Joining Lobby");
         PhotonNetwork.LocalPlayer.CustomProperties["SelectionData"] = ByteConverter.ObjectToByteArray(you.GetCSD());
         PhotonNetwork.LocalPlayer.CustomProperties["AllData"] = ByteConverter.ObjectToByteArray(you.GetEntity());
         JoinLobby();
@@ -356,7 +362,8 @@ public class PhotonController : MonoBehaviourPunCallbacks
 
         if(AllConfirmed())
         {
-            GameplayController.instance.DoActions(actions);
+            if(PhotonNetwork.IsMasterClient)
+                GameplayController.instance.DoActions(actions);
         }
         
     }
@@ -411,6 +418,26 @@ public class PhotonController : MonoBehaviourPunCallbacks
 
         return true;
     }
+
+
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+        Debug.Log("You've left the room");
+        GameplayController.instance.DestroyAll();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+        Debug.Log(otherPlayer.NickName+" has left the room");
+        
+    }
+
+
+
+
+
 
 
     

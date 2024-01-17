@@ -42,6 +42,11 @@ public class TopChar : MonoBehaviour
         return detailIdentity.GetID();
     }
 
+    public int GetOrder()
+    {
+        return detailIdentity.GetOrder();
+    }
+
     public PEntity GetFullID()
     {
         return detailIdentity;

@@ -14,6 +14,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     [SerializeField] List<PEntity> players;
     [SerializeField] List<TopChar> allPlayersChars;
     [SerializeField] bool debug;
+
+    [Header("BOMB")]
+    public int nextBomb = 0;
     
     private void OnValidate() {
         if(debug)
@@ -113,6 +116,37 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         allPlayersChars[0].GiveBomb();
     }
 
+    public void GachaBomb(int who)
+    {
+        Debug.Log("Give Bomb To");
+        allPlayersChars[who].GiveBomb();
+    }
+
+    public void GiveBomb(int who)
+    {
+        Debug.Log("Give Bomb to : "+(PlayerIdentity)who);
+        GPListener.instance.RaiseEvent(5, ReceiverGroup.All, EventCaching.DoNotCache, who);
+    }
+
+    public void GachaBombMultiplayer(int exception = -1)
+    {
+        List<object> param = new List<object>();
+        param.Add(players.Count);
+        param.Add(exception);
+        GPListener.instance.RaiseEvent(4, ReceiverGroup.MasterClient, EventCaching.DoNotCache, param.ToArray());
+    }
+
+    
+
+    public void GachaBombMultiplayer(List<int> exceptions)
+    {
+        List<object> param = new List<object>();
+        param.Add(players.Count);
+        param.Add(exceptions.ToArray());
+        GPListener.instance.RaiseEvent(4, ReceiverGroup.MasterClient, EventCaching.DoNotCache, param.ToArray());
+    }
+    
+
     public void EnableAllPlayerControl()
     {
         for(int i = 0 ; i < allPlayersChars.Count ; i++)
@@ -136,6 +170,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         return result;
     }
 
+    public List<int> DecreaseLiveMultiplayer(int who)
+    {
+        players[who].DecreaseLive();
+        List<int> result = new List<int>();
+        for(int i = 0 ; i < players.Count ; i++)
+        {
+            result.Add(players[i].mainLives);
+        }
+        return result;
+    }
+
     public bool DecreaseLive(int who, int which)
     {
         return players[who].DecreaseLive(which);
@@ -149,6 +194,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public PEntity GetPlayer(int order)
     {
         return players[order];
+    }
+
+    public List<PEntity> GetPlayers()
+    {
+        return players;
     }
 
     public PEntity GetPlayer(PlayerIdentity identity)
@@ -208,6 +258,20 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         {
             BaseChar res = allPlayersChars[i].GetCoreChar();
             result.Add(res);
+        }
+
+        return result;
+    }
+
+    public List<int> GetDead()
+    {
+        List<int> result = new List<int>();
+        for(int i = 0 ; i < players.Count ; i++)
+        {
+            if(players[i].GetHP() <= 0)
+            {
+                result.Add(i);
+            }
         }
 
         return result;
@@ -335,6 +399,11 @@ public class PEntity
         this.csd = new CharacterSelectionData();
         this.csd.chosenCharacterID = _csd.chosenCharacterID;
         
+    }
+
+    public int GetHP()
+    {
+        return mainLives;
     }
 
     public string GetUserID()
