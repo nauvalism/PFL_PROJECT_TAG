@@ -15,58 +15,100 @@ public class OpeningUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI goTxtTxt;
     [SerializeField] Image flashGO;
 
+    [Header("SWITCHERS")]
+    [SerializeField] CanvasGroup switcherCG;
+    [SerializeField] List<SwitchBetween> switchers;
 
+    public void ShowSwitchers()
+    {
+        for(int i = 0 ; i < switchers.Count ; i++)
+        {
+            switchers[i].StartAlternate();
+        }
+        LeanTween.cancel(switcherCG.gameObject);
+        LeanTween.value(switcherCG.gameObject, switcherCG.alpha, 1.0f, 1.0f).setOnUpdate((float f)=>{
+            switcherCG.alpha = f;
+        });
+        
+    }
+
+    public void HideSwitchers()
+    {
+        LeanTween.cancel(switcherCG.gameObject);
+        LeanTween.value(switcherCG.gameObject, switcherCG.alpha, .0f, 1.0f).setOnUpdate((float f)=>{
+            switcherCG.alpha = f;
+        }).setOnComplete(()=>{
+            for(int i = 0 ; i < switchers.Count ; i++)
+            {
+                switchers[i].StopAlternate();
+            }
+        });
+    }
 
     public void OpeningUISequence(System.Action after)
     {
-        LeanTween.cancel(readyTxt.gameObject);
-        LeanTween.cancel(goTxt.gameObject);
-        LeanTween.cancel(flashGO.GetComponent<RectTransform>());
-        
-        readyTxt.transform.localPosition = new Vector3(-1500.0f, .0f, .0f);
-        goTxt.transform.localScale = new Vector3(3.0f,3.0f,3.0f);
-        goTxtTxt.alpha = .0f;
-        flashGO.color = Color.clear;
-        
 
-        openingFader.interactable = true;
-        openingFader.blocksRaycasts = true;
-        LeanTween.value(openingFader.gameObject, .0f, 1.0f, 0.5f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
-            openingFader.alpha = f;
-        }).setOnComplete(()=>{
-            readyTxt.GetComponent<AudioSource>().Play();
-            LeanTween.moveLocalX(readyTxt, .0f, readySpeed).setEase(LeanTweenType.easeOutQuad).setOnComplete(()=>{
-                
-                LeanTween.moveLocalX(readyTxt, 1500.0f, 1.0f).setDelay(readyDelay/2).setEase(LeanTweenType.easeOutQuad);
-                
-                LeanTween.value(goTxt, .0f, 1.0f, 0.125f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
-                        goTxtTxt.alpha = f;
-                }).setDelay(readyDelay);
-                LeanTween.scale(goTxt.gameObject, new Vector3(1.5f, 1.5f,1.5f), 1.0f).setEase(LeanTweenType.easeOutQuad).setDelay(readyDelay).setOnComplete(()=>{
-                    goTxt.GetComponent<AudioSource>().Play();
-                    flashGO.color = Color.white;
-                    LeanTween.value(goTxt, 1.0f, .0f, 2.5f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
-                        goTxtTxt.alpha = f;
+        StartCoroutine(DoOpenUISequence());
+
+        IEnumerator DoOpenUISequence()
+        {
+            ShowSwitchers();
+            yield return new WaitForSeconds(5.0f);
+            HideSwitchers();
+            yield return new WaitForSeconds(3.0f);
+
+            LeanTween.cancel(readyTxt.gameObject);
+            LeanTween.cancel(goTxt.gameObject);
+            LeanTween.cancel(flashGO.GetComponent<RectTransform>());
+            
+            readyTxt.transform.localPosition = new Vector3(-1500.0f, .0f, .0f);
+            goTxt.transform.localScale = new Vector3(3.0f,3.0f,3.0f);
+            goTxtTxt.alpha = .0f;
+            flashGO.color = Color.clear;
+            
+
+            openingFader.interactable = true;
+            openingFader.blocksRaycasts = true;
+            LeanTween.value(openingFader.gameObject, .0f, 1.0f, 0.5f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
+                openingFader.alpha = f;
+            }).setOnComplete(()=>{
+                readyTxt.GetComponent<AudioSource>().Play();
+                LeanTween.moveLocalX(readyTxt, .0f, readySpeed).setEase(LeanTweenType.easeOutQuad).setOnComplete(()=>{
+                    
+                    LeanTween.moveLocalX(readyTxt, 1500.0f, 1.0f).setDelay(readyDelay/2).setEase(LeanTweenType.easeOutQuad);
+                    
+                    LeanTween.value(goTxt, .0f, 1.0f, 0.125f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
+                            goTxtTxt.alpha = f;
+                    }).setDelay(readyDelay);
+                    LeanTween.scale(goTxt.gameObject, new Vector3(1.5f, 1.5f,1.5f), 1.0f).setEase(LeanTweenType.easeOutQuad).setDelay(readyDelay).setOnComplete(()=>{
+                        goTxt.GetComponent<AudioSource>().Play();
+                        flashGO.color = Color.white;
+                        LeanTween.value(goTxt, 1.0f, .0f, 2.5f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
+                            goTxtTxt.alpha = f;
+                        });
+                        LeanTween.scale(goTxt, new Vector3(3.0f,3.0f,3.0f), 3.0f);
+                        LeanTween.alpha(flashGO.GetComponent<RectTransform>(), .0f, 1.25f).setEase(LeanTweenType.easeOutQuad);
+
+                        openingFader.interactable = false;
+                        openingFader.blocksRaycasts = false;
+
+                        LeanTween.value(openingFader.gameObject, 1.0f, .0f, 0.5f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
+                            openingFader.alpha = f;
+                        });
+
+
+                        if(after != null)
+                        {
+                            after();
+                        }
+
                     });
-                    LeanTween.scale(goTxt, new Vector3(3.0f,3.0f,3.0f), 3.0f);
-                    LeanTween.alpha(flashGO.GetComponent<RectTransform>(), .0f, 1.25f).setEase(LeanTweenType.easeOutQuad);
-
-                    openingFader.interactable = false;
-                    openingFader.blocksRaycasts = false;
-
-                    LeanTween.value(openingFader.gameObject, 1.0f, .0f, 0.5f).setEase(LeanTweenType.easeOutQuad).setOnUpdate((float f)=>{
-                        openingFader.alpha = f;
-                    });
-
-
-                    if(after != null)
-                    {
-                        after();
-                    }
-
                 });
             });
-        });
+        }
+
+
+        
 
 
         
