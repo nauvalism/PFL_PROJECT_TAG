@@ -1846,10 +1846,6 @@ PrefabInstance:
       propertyPath: coreChar
       value: 
       objectReference: {fileID: 6263200527408958991}
-    - target: {fileID: 606129976760212134, guid: e8ff9e0a57100534d83480a3e65120ce, type: 3}
-      propertyPath: m_Volume
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 3259283217427857184, guid: e8ff9e0a57100534d83480a3e65120ce, type: 3}
       propertyPath: m_Name
       value: bombRoot
