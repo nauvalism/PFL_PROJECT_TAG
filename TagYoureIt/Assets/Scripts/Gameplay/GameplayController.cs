@@ -96,6 +96,12 @@ public class GameplayController : MonoBehaviour
 
         
     }
+
+    public bool SetLocalIDPlayer(string nickName)
+    {
+        pm.SetYou(nickName);
+        return true;
+    }
     
     public void PutPlayerCredentials(List<PEntity> raws)
     {
@@ -151,6 +157,7 @@ public class GameplayController : MonoBehaviour
     {
         loop.Intro(()=>{
             pm.InitAllPlayers();
+            EnableAllControl();
         });
     }
 
@@ -167,8 +174,15 @@ public class GameplayController : MonoBehaviour
     {
         SetState(GameState.midGame);
         //pm.GachaBombMultiplayer();
-        if(PhotonNetwork.IsMasterClient)
-            GachaBombMultiplayer();
+        if(isMultiplayer)
+        {
+            if(PhotonNetwork.IsMasterClient)
+                GachaBombMultiplayer();
+        }
+        else
+        {
+            GachaBomb();
+        }
         //GachaBomb();
     }
 

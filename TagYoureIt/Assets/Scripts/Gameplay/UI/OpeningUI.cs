@@ -19,6 +19,9 @@ public class OpeningUI : MonoBehaviour
     [SerializeField] CanvasGroup switcherCG;
     [SerializeField] List<SwitchBetween> switchers;
 
+
+    
+
     public void ShowSwitchers()
     {
         for(int i = 0 ; i < switchers.Count ; i++)
@@ -53,9 +56,9 @@ public class OpeningUI : MonoBehaviour
         IEnumerator DoOpenUISequence()
         {
             ShowSwitchers();
-            yield return new WaitForSeconds(5.0f);
+            yield return new WaitForSeconds(2.0f);
             HideSwitchers();
-            yield return new WaitForSeconds(3.0f);
+            yield return new WaitForSeconds(1.0f);
 
             LeanTween.cancel(readyTxt.gameObject);
             LeanTween.cancel(goTxt.gameObject);

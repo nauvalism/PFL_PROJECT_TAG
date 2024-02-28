@@ -36,7 +36,7 @@ public class PhotonController : MonoBehaviourPunCallbacks
     }
 
     private void Start() {
-        TryingToConnect();
+        //TryingToConnect();
     }
 
     private void Update() {

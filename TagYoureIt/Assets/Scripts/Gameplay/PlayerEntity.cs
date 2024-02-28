@@ -29,6 +29,19 @@ public class PlayerEntity : MonoBehaviour
         
     }
 
+    public void RegisterPlayer(string str)
+    {
+        Guid g = System.Guid.NewGuid();
+        PlayerProfile pp = new PlayerProfile();
+        pp.userID = g.ToString();
+        pp.nickName = str;
+        pp.exp = 0;
+        pp.charExps = new List<int>();
+        pp.charExps.Add(0);
+
+        detailEntity.SetPlayerProfile(pp);
+    }
+
     public PEntity GetEntity()
     {
         return detailEntity;

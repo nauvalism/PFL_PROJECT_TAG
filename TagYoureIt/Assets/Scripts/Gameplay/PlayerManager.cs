@@ -186,6 +186,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         return players[who].DecreaseLive(which);
     }
 
+    public void SetYou(string nickName)
+    {
+        yourEntity.RegisterPlayer(nickName);
+    }
+
     public PEntity GetYou()
     {
         return yourEntity.GetEntity();

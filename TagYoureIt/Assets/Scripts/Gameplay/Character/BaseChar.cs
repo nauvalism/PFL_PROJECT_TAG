@@ -22,6 +22,8 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] CharacterProfile stat;
     [SerializeField] PInputKeys keys;
     [SerializeField] CharBomb bomb;
+    [SerializeField] bool AIOverride = false;
+    [SerializeField] float stunModifier = 1;
 
 
     [Header("Movement")]
@@ -163,12 +165,12 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
         {
             if(base.photonView.IsMine)
             {
-                rootActorMovement.Translate((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection);
+                rootActorMovement.Translate(((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection) * stunModifier);
             }
         }
         else
         {
-            rootActorMovement.Translate((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection);
+            rootActorMovement.Translate(((movementAttributes.speed + (movementAttributes.runSpeedAddition * System.Convert.ToInt32(movementAttributes.running)))/movementAttributes.runSpeedSlow * Time.deltaTime * moveDirection) * stunModifier);
         }
     
         if (!grounded)
@@ -433,10 +435,11 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
         iSensor.EnableCol();
         rb.sharedMaterial = null;
         col.enabled = true;
-        movementAttributes.controllable = true;
+        EnableMovement();
         animManager.Move();
         animManager.PlayNonMovementAnim("Idle");
         launched = false;
+        stunModifier = 1;
     }
 
     public void Explode()
@@ -521,9 +524,10 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
 
     public virtual void Stunned()
     {
-        movementAttributes.controllable = false;
+        DisableMovement();
         movement.x = 0;
         movement.y = 0;
+        stunModifier = 0;
         animManager.UnMove();
     }
 
@@ -554,7 +558,8 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
 
     public virtual void EnableMovement()
     {
-        movementAttributes.controllable = true;
+        if(!AIOverride)
+            movementAttributes.controllable = true;
     }
 
     public virtual void DisableMovement()
@@ -588,7 +593,11 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     
-
+    public void SetAIMovement(Vector2 direction)
+    {
+        this.movement.x = direction.x;
+        this.movement.y = direction.y;
+    }
 
 
 
