@@ -48,9 +48,13 @@ public class OpeningUI : MonoBehaviour
         });
     }
 
-    public void OpeningUISequence(System.Action after)
+    public void OpeningUISequence(System.Action after, bool instant = false)
     {
-
+        if(instant)
+        {
+            after();
+            return;
+        }
         StartCoroutine(DoOpenUISequence());
 
         IEnumerator DoOpenUISequence()

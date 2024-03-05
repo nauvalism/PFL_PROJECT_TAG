@@ -8,6 +8,7 @@ TagManager:
   - InteractableObject
   - Character
   - Sensor
+  - RandomTargets
   layers:
   - Default
   - TransparentFX

@@ -53,7 +53,7 @@ public class InteractionSensor : MonoBehaviour
             if(owner.Bombed())
             {
                 interactedChar = other.GetComponent<BaseChar>();
-                
+                owner.AddAITarget();
             }
             
         }

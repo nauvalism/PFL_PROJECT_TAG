@@ -78,12 +78,45 @@ public class PhotonController : MonoBehaviourPunCallbacks
         aval = new AuthenticationValues(you.GetUserID());
         PhotonNetwork.AuthValues = aval;
         PhotonNetwork.NickName = you.GetNickName();
+        
         PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public override void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics)
+    {
+        base.OnLobbyStatisticsUpdate(lobbyStatistics);
+        // for(int i = 0 ; i < lobbyStatistics.Count ; i++)
+        // {
+        //     Debug.Log("Lobby Name :"+lobbyStatistics[i].ToString());
+            
+        // }
+        
+        // int lobbyID = SearchLobby(PhotonNetwork.CurrentLobby.Name.ToLower());
+        
+        // int playersInlobby = lobbyStatistics[lobbyID].PlayerCount;
+        // int roomInLobby = lobbyStatistics[lobbyID].RoomCount;
+        // int playerIdle = lobbyStatistics[lobbyID].PlayerCount - PhotonNetwork.CountOfPlayersInRooms;
+        // debugUI.UpdateInfo(playersInlobby, roomInLobby, playerIdle);
+    
+    
+        // int SearchLobby(string lobbyName)
+        // {
+        //     for(int i = 0 ; i < lobbyStatistics.Count ; i++)
+        //     {
+        //         if(lobbyStatistics[i].Name.ToLower() == lobbyName)
+        //         {
+        //             return i;
+        //         }
+        //     }
+
+        //     return 0;
+        // }
     }
 
     public void JoinLobby()
     {
-        TypedLobby lobbyProfile = new TypedLobby("1v1", LobbyType.Default);
+        
+        TypedLobby lobbyProfile = new TypedLobby("OneVOneWithTheGreatOne", LobbyType.Default);
         PhotonNetwork.JoinLobby(lobbyProfile);
     }
 
@@ -177,7 +210,7 @@ public class PhotonController : MonoBehaviourPunCallbacks
             
 
             //spawn everything
-            GameplayController.instance.SpawnPlayersLocal(true);
+            GameplayController.instance.SpawnPlayersLocal(false, true);
             
             
         }
@@ -240,7 +273,7 @@ public class PhotonController : MonoBehaviourPunCallbacks
             
 
             //spawn everything
-            GameplayController.instance.SpawnPlayersLocal(true);
+            GameplayController.instance.SpawnPlayersLocal(false, true);
         }
     }
 
@@ -320,6 +353,7 @@ public class PhotonController : MonoBehaviourPunCallbacks
 
     public void DistributeOwnership(int who)
     {
+        Debug.Log("Distributing Ownership");
         List<BaseChar> chars = GameplayController.instance.GetPM().GetAllChars();
         chars[who].GetComponent<PhotonView>().TransferOwnership((who + 1));
         Confirm(who, ActionList.Start_Game);
@@ -328,15 +362,34 @@ public class PhotonController : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         base.OnJoinedLobby();
+        InvokeRepeating("RefreshRoomInfo",0, 1.0f);
+
+        
+        
+
         debugUI.ShowUI();
+        
+        
+
+    }
+
+    public void RefreshRoomInfo()
+    {
+        int pil = PhotonNetwork.CountOfPlayers;
+        int playersWaiting = PhotonNetwork.CountOfPlayersInRooms % 2;
+        int ril = PhotonNetwork.CountOfRooms;
+
+        debugUI.UpdateInfo(pil, ril, playersWaiting);
     }
 
 
 
     public override void OnConnectedToMaster()
     {
-        base.OnConnectedToMaster();
+        
+        Debug.Log("Connected to Master Server !!");
         FillCredentialAndJoinLobby();
+        base.OnConnectedToMaster();
     }
 
     public void FillCredentialAndJoinLobby()
@@ -416,8 +469,12 @@ public class PhotonController : MonoBehaviourPunCallbacks
             return false;
         }
 
+        
+
         return true;
     }
+
+    
 
 
     public override void OnLeftRoom()

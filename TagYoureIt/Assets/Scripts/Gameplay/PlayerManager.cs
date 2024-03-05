@@ -256,6 +256,53 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         return null;
     }
 
+    public int GetOppositeCharMultiplayer(int iden)
+    {
+        List<BaseChar> notMeChars = new List<BaseChar>();
+        for(int i = 0 ; i < allPlayersChars.Count ;i++)
+        {
+            if(allPlayersChars[i].GetID() != (PlayerIdentity)iden)
+            {
+                notMeChars.Add(allPlayersChars[i].GetCoreChar());
+            }
+        }
+
+
+        BaseChar result = notMeChars[Random.Range(0,notMeChars.Count)];
+        return (int)result.GetID();
+    }
+
+    public BaseChar GetOppositeChar(PlayerIdentity iden)
+    {
+        List<BaseChar> notMeChars = new List<BaseChar>();
+        for(int i = 0 ; i < allPlayersChars.Count ;i++)
+        {
+            if(allPlayersChars[i].GetID() != iden)
+            {
+                notMeChars.Add(allPlayersChars[i].GetCoreChar());
+            }
+        }
+
+        BaseChar result = notMeChars[Random.Range(0,notMeChars.Count)];
+        return result;
+    }
+
+    public BaseChar GetOppositeChar(BaseChar c)
+    {
+        List<BaseChar> notMeChars = new List<BaseChar>();
+        for(int i = 0 ; i < allPlayersChars.Count ;i++)
+        {
+            if(allPlayersChars[i].GetID() != c.GetID())
+            {
+                notMeChars.Add(allPlayersChars[i].GetCoreChar());
+            }
+        }
+
+
+        BaseChar result = notMeChars[Random.Range(0,notMeChars.Count)];
+        return result;
+    }
+
     public List<BaseChar> GetAllChars()
     {
         List<BaseChar> result = new List<BaseChar>();
@@ -352,7 +399,7 @@ public class PEntity
 
     public PEntity()
     {
-        mainLives = 1;
+        mainLives = 3;
         try
         {
             lives = new List<int>();

@@ -1,16 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class DebugGameplayUI : MonoBehaviour
 {
     
     [SerializeField] CanvasGroup mainCG;
+    [SerializeField] CanvasGroup waitingForPlayerCG;
+    [SerializeField] GameObject switchToLocalBtn;
     [SerializeField] GameObject mainDebugGameplay;
     [SerializeField] int you;
     [SerializeField] List<PlayerProfile> debugProfiles;
     [SerializeField] List<Identities> identities;
     [SerializeField] List<CharacterSelectionData> csds;
+    [SerializeField] TextMeshProUGUI waitingInQueue;
     
     public void ShowUI()
     {
@@ -42,7 +47,7 @@ public class DebugGameplayUI : MonoBehaviour
     }
 
 
-    public void StartLocal()
+    public void StartLocal(bool withAI)
     {
         HideUI(0.5f, ()=>{
             GameplayController.instance.ResetAllCoreAttribute();
@@ -53,7 +58,7 @@ public class DebugGameplayUI : MonoBehaviour
             
 
 
-            GameplayController.instance.SpawnPlayersLocal();
+            GameplayController.instance.SpawnPlayersLocal(withAI);
             GameplayController.instance.InitAllPlayers();
             GameplayController.instance.GameIntro();
             GameplayController.instance.PlayMusic();
@@ -61,6 +66,29 @@ public class DebugGameplayUI : MonoBehaviour
         });
         
         //mainDebugGameplay.SetActive(false);
+    }
+
+    public void UpdateInfo(int pil, int ril, int pidle)
+    {
+        //Debug.Log("info : "+pil+"_"+ril+"_"+pidle);
+        string message = "Players currently playing is : "+pil.ToString();
+        message += "\n Player waiting to play is : "+pidle.ToString();
+    
+        waitingInQueue.text = message;
+    }
+
+    public void UpdateInfo(int total, int pil, int ril, int pidle)
+    {
+        //Debug.Log("info : "+total+"_"+pil+"_"+ril+"_"+pidle);
+        string message = "Players in server : "+pil.ToString();
+        message += "\n Player waiting to play is : "+pidle.ToString();
+    
+        waitingInQueue.text = message;
+    }
+
+    public void UpdateInQueue()
+    {
+
     }
 
     public void StartQueue()

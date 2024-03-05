@@ -19,6 +19,14 @@ PrefabInstance:
       propertyPath: observableSearch
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6263200527408958991, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
+      propertyPath: stat
+      value: 
+      objectReference: {fileID: 11400000, guid: 5eb1494002cdc6143bb7fc5c00aa3b21, type: 2}
+    - target: {fileID: 6584522368157230226, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
+      propertyPath: detailIdentity.mainLives
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7535947480378374434, guid: 08d1fda689a12244299c803870b9ba38, type: 3}
       propertyPath: m_RootOrder
       value: 0

@@ -22,6 +22,7 @@ public class GameplayController : MonoBehaviour
     [SerializeField] MusicManager music;
     [SerializeField] BaseMap currentMap;
     public bool isMultiplayer;
+    public bool pvAI = false;
     private void Awake() {
         instance = this;
     }
@@ -29,6 +30,14 @@ public class GameplayController : MonoBehaviour
     private void Start() {
         
         //GachaBomb();
+    }
+
+    private void Update() {
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            GachaBomb(1);
+            pm.GetChar(1).ActivateAI();
+        }
     }
 
     public PlayerManager GetPM()
@@ -123,15 +132,17 @@ public class GameplayController : MonoBehaviour
         pm.AssignViewIds(vids);
     }
 
-    public void SpawnPlayersLocal(bool multi = false)
+    public void SpawnPlayersLocal(bool opponentAI = false, bool multi = false)
     {
         pm.SpawnPlayersLocal();
+        this.pvAI = opponentAI;
         if(multi)
         {
             List<object> param = new List<object>();
             param.Add(pm.GetYou().GetUserID());
             GPListener.instance.RaiseEvent(1, Photon.Realtime.ReceiverGroup.MasterClient, Photon.Realtime.EventCaching.DoNotCache, param.ToArray());
         }
+        
     }
 
     #region ACTIONS
@@ -158,7 +169,12 @@ public class GameplayController : MonoBehaviour
         loop.Intro(()=>{
             pm.InitAllPlayers();
             EnableAllControl();
-        });
+            if(pvAI)
+            {
+                BaseChar bc = pm.GetOppositeChar(PlayerIdentity.player_1);
+                bc.SwitchAI(true);
+            }
+        }, false);
     }
 
     public void IntroMultiplayer()
@@ -167,7 +183,7 @@ public class GameplayController : MonoBehaviour
         pm.InitAllPlayers();
         loop.Intro(()=>{
             GPListener.instance.EnableAllControls();
-        });
+        }, false);
     }
 
     public void EnableAllControl()
@@ -365,6 +381,21 @@ public class GameplayController : MonoBehaviour
     public PEntity GetOppositePlayer(PlayerIdentity identity)
     {
         return pm.GetOppositePlayer(identity);
+    }
+
+    public int GetOppositeCharMultiplayer(int iden)
+    {
+        return pm.GetOppositeCharMultiplayer(iden);
+    }
+
+    public BaseChar GetOppositeChar(PlayerIdentity identity)
+    {
+        return pm.GetOppositeChar(identity);
+    }
+
+    public BaseChar GetOppositeChar(BaseChar c)
+    {
+        return pm.GetOppositeChar(c);
     }
 
     public bool IsYou(PEntity credential)

@@ -22,10 +22,10 @@ public class LoopManager : MonoBehaviour
     
     
 
-    public void Intro(System.Action next)
+    public void Intro(System.Action next, bool instant = false)
     {
         ChangeGameState(GameState.opening);
-        openingUI.OpeningUISequence(next);
+        openingUI.OpeningUISequence(next, instant);
     }
 
     public void Resulting(PEntity whoWins)

@@ -34,6 +34,7 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] PhysicsMaterial2D bounceMat;
     [SerializeField] Collider2D col;
     [SerializeField] MovementAttributes movementAttributes;
+    [SerializeField] CharRunBar runBar;
     
     [Header("Ground and Jump")]
     [SerializeField] bool grounded = true;
@@ -55,6 +56,9 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] InteractionSensor iSensor;
     [SerializeField] Explosion explo;
     [SerializeField] SoundManager impactSounds;
+
+    [Header("AI")]
+    [SerializeField] CoreAI ai;
     
     
     public virtual void InitializeIdentity(PlayerIdentity iden, int _order)
@@ -77,7 +81,7 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        
+        runBar.AddDetail(movementAttributes.runMaxValue, movementAttributes.rspd, movementAttributes.recspd);
     }
 
     // Update is called once per frame
@@ -112,13 +116,19 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
             //if(Input.GetKeyDown(KeyCode.LeftShift))
             if(Input.GetButtonDown(keys.run))
             {
-                movementAttributes.running = true;
+                if(runBar.AvailableToRun())
+                {
+                    movementAttributes.running = true;
+                    runBar.Run();
+                }
+                
             }
 
             //if(Input.GetKeyUp(KeyCode.LeftShift))
             if(Input.GetButtonUp(keys.run))
             {
                 movementAttributes.running = false;
+                runBar.NotRun();
             }
 
             //if(Input.GetButtonDown("Jump"))
@@ -158,9 +168,21 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
         if(!root.GetAlive())
         return;
 
+        if(GameplayController.instance.GetState() != GameState.midGame)
+        {
+            return;
+        }
+
         grounded = Physics2D.Linecast(groundCheckF.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
     
+
+        if(runBar.GetRunBarValue() <= 0)
+        {
+            UnRun();
+        }
+
         Vector2 moveDirection = new Vector2(movement.x, 0).normalized;
+        movementAttributes.speed = (Bombed() ? movementAttributes.bombedSpeed : movementAttributes.defaultSpeed);
         if(GameplayController.instance.IsMultiplayer())
         {
             if(base.photonView.IsMine)
@@ -213,6 +235,12 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
         // {
         //     rb.sharedMaterial = null;
         // }
+    }
+
+    public void UnRun()
+    {
+        this.movementAttributes.running = false;
+        runBar.NotRun();
     }
 
     IEnumerator Land()
@@ -556,6 +584,21 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
         animManager.PlayAnimAbsolutely("DeadHit");
     }
 
+    public void SwitchAI(bool b)
+    {
+        if(b)
+        {
+            ai.OverrideControl();
+        }
+    }
+
+    public void OverrideAI(bool b)
+    {
+        DisableMovement();
+        this.AIOverride = b;
+        
+    }
+
     public virtual void EnableMovement()
     {
         if(!AIOverride)
@@ -570,6 +613,16 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
     public Vector2 GetPosition()
     {
         return rootActorMovement.position;
+    }
+
+    public Transform GetRootActorMovement()
+    {
+        return rootActorMovement;
+    }
+
+    public Transform GetCenterActorMovement()
+    {
+        return graphicRoot;
     }
 
     public bool IsYou()
@@ -599,12 +652,29 @@ public class BaseChar : MonoBehaviourPunCallbacks, IPunObservable
         this.movement.y = direction.y;
     }
 
+    public void SetAIJump()
+    {
+        Jump();
+    }
 
 
+    public void ActivateAI()
+    {
+        ai.OverrideControl();
+    }
 
-
-
-
+    public void AddAITarget()
+    {
+        if(AIOverride)
+        {
+            Tag();
+            if(!Bombed())
+            {
+                ai.ResetChecker();
+                ai.GeneratePathFromRandom();
+            }
+        }
+    }
 
 
 
@@ -682,13 +752,22 @@ public class JumpAttributes
 public class MovementAttributes
 {
     public float speed = 2.0f;
+    public float defaultSpeed = 2.0f;
+    public float bombedSpeed = 4.0f;
     public float runSpeedAddition = 2.0f;
     public float runSpeedSlow = 1.0f;
+    public float maxRunStamina = 1.0f;
+    public float runStaminaPerSecond = 1.0f;
     public float runSpeedDefaultValue = 1.0f;
     public string Hkey = "Horizontal";
     
     public bool controllable = true;
     public bool running = true;
+
+    [Header("RUN VALUES")]
+    public float runMaxValue = 90;
+    public float rspd = 15;
+    public float recspd = 10;
 
     public void FillFromJSON(JSONNode json)
     {
